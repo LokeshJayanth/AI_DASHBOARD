@@ -1,0 +1,63 @@
+// Enhanced version with better dataset display
+const loadDatasets = async () => {
+    const container = document.getElementById('datasetsContainer');
+    if (!container) return;
+    const spinner = showSpinner(container);
+    try {
+        const response = await fetch('/dataset/');
+        const data = await response.json();
+        spinner.remove();
+        if (data.success && data.datasets.length > 0) {
+            container.innerHTML = data.datasets.map(dataset => {
+                const statusColor = dataset.status === 'completed' ? 'var(--success-color)' : dataset.status === 'failed' ? 'var(--error-color)' : 'var(--warning-color)';
+                return `<div class="card"><div class="card-header">${dataset.name}</div><div class="card-body"><p>${dataset.description || 'No description'}</p><p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;"><strong>Type:</strong> ${dataset.file_type} | <strong>Size:</strong> ${(dataset.file_size / 1024).toFixed(2)} KB</p>${dataset.row_count !== undefined ? `<p style="color: var(--text-secondary); font-size: 0.9rem;"><strong>Rows:</strong> ${dataset.row_count} | <strong>Columns:</strong> ${dataset.column_count}</p>` : ''}<p style="color: ${statusColor}; font-size: 0.85rem; margin-top: 0.5rem;">Status: ${dataset.status.toUpperCase()}</p><p style="color: var(--text-secondary); font-size: 0.85rem;">Uploaded: ${new Date(dataset.created_at).toLocaleString()}</p><div style="margin-top: 1rem;"><button class="btn btn-secondary" onclick="viewDataset(${dataset.id})">View Data</button></div></div></div>`;
+            }).join('');
+        } else {
+            container.innerHTML = '<div class="card" style="text-align: center;"><p style="color: var(--text-secondary);">No datasets uploaded yet</p><a href="/upload/" class="btn btn-primary" style="margin-top: 1rem;">Upload Dataset</a></div>';
+        }
+    } catch (error) {
+        spinner.remove();
+        container.innerHTML = '<div class="alert alert-error">Failed to load datasets</div>';
+        console.error('Error loading datasets:', error);
+    }
+};
+
+const viewDataset = async (datasetId) => {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 2rem;';
+    modal.innerHTML = '<div style="background: var(--dark-bg); padding: 2rem; border-radius: 1rem; max-width: 900px; width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border-color);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;"><h2 style="color: var(--text-primary);">Dataset Preview</h2><button onclick="this.closest(\'div[style*=\\"position: fixed\\"]\').remove()" style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer;">&times;</button></div><div class="spinner"></div></div>';
+    document.body.appendChild(modal);
+    try {
+        const response = await fetch(`/dataset/${datasetId}`);
+        const data = await response.json();
+        if (data.success && data.dataset.preview && data.dataset.preview.length > 0) {
+            modal.querySelector('.spinner').remove();
+            const preview = data.dataset.preview;
+            const columns = Object.keys(preview[0]).filter(col => col !== 'uploaded_at' && col !== 'id');
+            let tableHTML = '<div style="overflow-x: auto;"><table class="table" style="width: 100%; margin-top: 1rem;"><thead><tr>';
+            columns.forEach(col => tableHTML += `<th>${col}</th>`);
+            tableHTML += '</tr></thead><tbody>';
+            preview.forEach(row => {
+                tableHTML += '<tr>';
+                columns.forEach(col => {
+                    const value = row[col] !== null && row[col] !== undefined ? row[col] : '';
+                    tableHTML += `<td>${value}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            tableHTML += '</tbody></table></div>';
+            let statsHTML = '';
+            if (data.dataset.statistics) {
+                const stats = data.dataset.statistics;
+                stats HTML = `<div style="margin-bottom: 1rem; padding: 1rem; background: var(--card-bg); border-radius: 0.5rem;"><p style="color: var(--text-primary);"><strong>Total Rows:</strong> ${stats.total_rows}</p><p style="color: var(--text-primary);"><strong>Total Columns:</strong> ${stats.column_count}</p></div>`;
+            }
+            modal.querySelector('div > div').insertAdjacentHTML('beforeend', statsHTML + tableHTML);
+        } else {
+            modal.remove();
+            showAlert('No data available or dataset not yet processed', 'warning');
+        }
+    } catch (error) {
+        modal.remove();
+        showAlert('An error occurred', 'error');
+    }
+};

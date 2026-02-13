@@ -1,0 +1,11 @@
+name,age,salary,department,join_date
+John Doe,30,50000,Sales,2020-01-15
+Jane Smith,25,60000,Marketing,2021-03-20
+Bob Johnson,, 75000,Engineering,2019-07-10
+Alice Williams,35,,Sales,2020-05-12
+Charlie Brown,28,55000,,2021-09-01
+,,45000,HR,2022-01-05
+David Lee,32,80000,Engineering,
+Emma Davis,29,62000,Marketing,2021-11-15
+John Doe,30,50000,Sales,2020-01-15
+Frank Miller,40,90000,Engineering,2018-06-22

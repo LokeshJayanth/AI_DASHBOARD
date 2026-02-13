@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaned Preview - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            background: #10b981;
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .column-checkbox {
+            margin-right: 0.5rem;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .comparison-section h3 {
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .success-box {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">AI Dashboard</a>
+            <ul class="navbar-menu">
+                <li><a href="/" class="navbar-link">Home</a></li>
+                <li><a href="/workflow/" class="navbar-link active">Workflow</a></li>
+                <li><a href="/dashboard" class="navbar-link">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2 style="margin: 0;">✨ Cleaned Data Preview: {{ dataset_name }}</h2>
+                <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.9rem;">
+                    Step 4 of 6: Select columns to keep and proceed to download
+                </p>
+            </div>
+        </div>
+
+        <div class="success-box">
+            <strong>✅ Auto-Cleaning Complete!</strong>
+            <p style="margin: 0.5rem 0 0 0;">Your data has been automatically cleaned and is now BI-ready.</p>
+        </div>
+
+        <div class="comparison-grid">
+            <div class="card">
+                <h3 style="padding: 1rem 1rem 0 1rem;">📊 Before Cleaning</h3>
+                <div class="card-body">
+                    <div class="stat-item">
+                        <span>Rows:</span>
+                        <strong>{{ stats.before.rows }}</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Columns:</span>
+                        <strong>{{ stats.before.columns }}</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>NULL Values:</span>
+                        <strong style="color: #ef4444;">{{ stats.before.nulls }}</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Duplicates:</span>
+                        <strong style="color: #ef4444;">{{ stats.before.duplicates }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="padding: 1rem 1rem 0 1rem;">✅ After Cleaning</h3>
+                <div class="card-body">
+                    <div class="stat-item">
+                        <span>Rows:</span>
+                        <strong style="color: #10b981;">{{ stats.after.rows }}</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Columns:</span>
+                        <strong style="color: #10b981;">{{ stats.after.columns }}</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>NULL Values:</span>
+                        <strong style="color: #10b981;">{{ stats.after.nulls }}</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Duplicates:</span>
+                        <strong style="color: #10b981;">{{ stats.after.duplicates }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Select Columns to Keep</div>
+            <div class="card-body">
+                <form id="columnForm" action="/workflow/select-columns" method="POST">
+                    <div class="control-buttons">
+                        <button type="button" id="selectAll" class="btn btn-secondary">Select All</button>
+                        <button type="button" id="deselectAll" class="btn btn-secondary">Deselect All</button>
+                    </div>
+
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Check the columns you want to keep in your final dataset
+                    </p>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
+                        {% for column in columns %}
+                        <label
+                            style="display: flex; align-items: center; padding: 0.5rem; background: #f9fafb; border-radius: 6px; cursor: pointer;">
+                            <input type="checkbox" name="columns" value="{{ column }}" class="column-checkbox" checked>
+                            <span>{{ column }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem;">
+                        Proceed to Download →
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Cleaned Data Preview (First 10 Rows)</div>
+            <div class="card-body" style="overflow-x: auto; padding: 0;">
+                {{ preview|safe }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const selectAllBtn = document.getElementById('selectAll');
+        const deselectAllBtn = document.getElementById('deselectAll');
+        const checkboxes = document.querySelectorAll('.column-checkbox');
+
+        selectAllBtn.addEventListener('click', () => {
+            checkboxes.forEach(cb => cb.checked = true);
+        });
+
+        deselectAllBtn.addEventListener('click', () => {
+            checkboxes.forEach(cb => cb.checked = false);
+        });
+
+        document.getElementById('columnForm').addEventListener('submit', (e) => {
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            if (checkedCount === 0) {
+                e.preventDefault();
+                alert('Please select at least one column to proceed.');
+            }
+        });
+    </script>
+</body>
+
+</html>

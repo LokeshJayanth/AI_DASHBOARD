@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - {{ dataset_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .tab {
+            padding: 14px 32px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            border-color: #a78bfa;
+            color: #7c3aed;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            color: white;
+            border-color: #a78bfa;
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f4f6;
+            border-top: 5px solid #a78bfa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading p {
+            font-size: 16px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(167, 139, 250, 0.15);
+            border-color: #a78bfa;
+        }
+
+        \n\n .stat-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .stat-subtitle {
+            font-size: 14px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        /* Insights Section */
+        .insights-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 30px;
+        }
+
+        .insights-section h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .insights-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .insights-list li {
+            padding: 14px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .insights-list li:last-child {
+            border-bottom: none;
+        }
+
+        .insights-list li:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+            font-size: 18px;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .chart-container h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        /* Prompt Mode */
+        .prompt-section {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .prompt-input-group {
+            max-width: 600px;
+            margin: 0 auto 24px;
+        }
+
+        .prompt-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .prompt-input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+        }
+
+        .prompt-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prompt-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(167, 139, 250, 0.4);
+        }
+
+        .prompt-response {
+            max-width: 700px;
+            margin: 24px auto;
+            padding: 24px;
+            background: #f9fafb;
+            border-radius: 12px;
+            border-left: 4px solid #a78bfa;
+            text-align: left;
+            display: none;
+        }
+
+        .prompt-response.active {
+            display: block;
+        }
+
+        /* Coming Soon Badge */
+        .coming-soon {
+            display: inline-block;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            animation: fadeIn 0.8s ease 0.4s both;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 26px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .mode-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mode Selection Screen */
+        .mode-selection {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .mode-selection h2 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .mode-selection>p {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 40px;
+        }
+
+        .mode-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .mode-card {
+            background: white;
+            border: 3px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-8px);
+            border-color: #a78bfa;
+            box-shadow: 0 12px 28px rgba(167, 139, 250, 0.25);
+        }
+
+        .mode-card:active {
+            transform: translateY(-4px);
+        }
+
+        .mode-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .mode-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .mode-card p {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .mode-btn {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+        }
+
+        .mode-badge {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>🧠 AI-Powered Analytics</h1>
+            <p>{{ dataset_name }}</p>
+        </div>
+
+
+        <!-- Mode Selection Screen -->
+        <div id="modeSelection" class="mode-selection">
+            <h2>📊 Choose Your Analytics Mode</h2>
+            <p>Select how you'd like to analyze your dataset</p>
+
+            <div class="mode-options">
+                <div class="mode-card" onclick="selectMode('auto')">
+                    <div class="mode-icon">🤖</div>
+                    <h3>Auto Mode</h3>
+                    <p>AI automatically generates insights, charts, and statistics from your data</p>
+                    <div class="mode-btn">Select Auto Mode</div>
+                </div>
+
+                <div class="mode-card">
+                    <div class="mode-icon">💬</div>
+                    <h3>Prompt Mode</h3>
+                    <p>Ask questions about your data using natural language</p>
+                    <div class="mode-badge">COMING SOON</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Switcher (Hidden Initially) -->
+        <div class="tabs" id="tabSwitcher" style="display: none;">
+            <div class="tab active" id="autoTabBtn" onclick="switchTab('auto')">
+                <span>🤖</span> Auto Mode
+            </div>
+            <div class="tab" id="promptTabBtn" onclick="switchTab('prompt')">
+                <span>💬</span> Prompt Mode
+                <span class="coming-soon">COMING SOON</span>
+            </div>
+        </div>
+
+        <!-- Auto Mode Tab -->
+        <div id="autoTab" class="tab-content active">
+            <!-- Loading State -->
+            <div class="loading" id="loadingState">
+                <div class="spinner"></div>
+                <p>✨ Generating AI insights...</p>
+            </div>
+
+            <!-- Content (Hidden Initially) -->
+            <div id="autoContent" style="display: none;">
+                <!-- Stats Grid -->
+                <div class="stats-grid" id="statsGrid"></div>
+
+                <!-- Insights -->
+                <div class="insights-section">
+                    <h2>💡 Key Insights</h2>
+                    <ul class="insights-list" id="insightsList"></ul>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid" id="chartsGrid"></div>
+            </div>
+        </div>
+
+        <!-- Prompt Mode Tab -->
+        <div id="promptTab" class="tab-content">
+            <div class="prompt-section">
+                <h2 style="margin-bottom: 16px;">🚧 Natural Language Analytics</h2>
+                <p style="color: #6b7280; margin-bottom: 30px;">Ask questions about your data in plain English</p>
+
+                <div class="prompt-input-group">
+                    <input type="text" class="prompt-input" id="promptInput"
+                        placeholder="e.g., What is the average salary by department?">
+                    <button class="prompt-btn" onclick="askQuestion()">Ask Question</button>
+                </div>
+
+                <div class="prompt-response" id="promptResponse">
+                    <p><strong>AI Response:</strong></p>
+                    <p id="responseText"></p>
+                </div>
+
+                <p style="color: #9ca3af; font-size: 14px; margin-top: 20px;">
+                    💡 This feature will allow you to query your data using natural language powered by AI
+                </p>
+            </div>
+        </div>
+
+        <!-- Download & Action Section -->
+        <div id="downloadSection" class="download-section" style="display: none;">
+            <h2>💾 Download & Continue</h2>
+            <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">
+                Export your insights or continue with advanced analytics
+            </p>
+
+            <div class="download-grid">
+                <div class="download-card">
+                    <div class="download-icon">📄</div>
+                    <h3>Download CSV</h3>
+                    <p>Cleaned dataset in CSV format</p>
+                    <a href="{{ url_for('upload.download_csv') }}" class="download-btn">
+                        ⬇ Download CSV
+                    </a>
+                </div>
+
+                <div class="download-card">
+                    <div class="download-icon">📊</div>
+                    <h3>Download Excel</h3>
+                    <p>Cleaned dataset in Excel format</p>
+                    <a href="{{ url_for('upload.download_excel') }}" class="download-btn">
+                        ⬇ Download Excel
+                    </a>
+                </div>
+
+                <div class="download-card">
+                    <div class="download-icon">📈</div>
+                    <h3>Power BI Template</h3>
+                    <p>Pre-built dashboard with all charts</p>
+                    <a href="{{ url_for('upload.download_powerbi') }}" class="download-btn powerbi-btn">
+                        ⬇ Download .pbix
+                    </a>
+                </div>
+
+                <div class="download-card">
+                    <div class="download-icon">💬</div>
+                    <h3>Prompt Analytics</h3>
+                    <p>Ask questions about your data</p>
+                    <a href="/workflow/prompt-mode" class="download-btn prompt-btn">
+                        ➡ Go to Prompt Mode
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save to Database Section -->
+        <div id="saveSection" class="save-section" style="display: none; margin-bottom: 30px;">
+            <div
+                style="text-align: center; background: white; border-radius: 16px; padding: 40px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #e5e7eb;">
+                <div style="font-size: 64px; margin-bottom: 20px;">💾</div>
+                <h2 style="font-size: 28px; font-weight: 800; color: #1f2937; margin-bottom: 12px;">Save Your Dataset
+                </h2>
+                <p
+                    style="font-size: 16px; color: #6b7280; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    Save this cleaned and analyzed dataset to your database. You'll be able to view it in Storage and
+                    access it anytime.
+                </p>
+                <button onclick="saveToDatabase()" id="saveBtn" class="btn"
+                    style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); padding: 18px 48px; font-size: 16px;">
+                    💾 Save to Database & View in Storage
+                </button>
+                <div id="saveStatus" style="margin-top: 20px; display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions">
+            <a href="{{ url_for('upload.upload_page') }}" class="btn btn-secondary">
+                ← New Upload
+            </a>
+            <a href="{{ url_for('dashboard.user_dashboard') }}" class="btn btn-primary">
+                Go to Dashboard →
+            </a>
+        </div>
+    </div>
+
+    <style>
+        /* Download Section */
+        .download-section {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .download-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .download-card {
+            background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .download-card:hover {
+            transform: translateY(-4px);
+            border-color: #a78bfa;
+            box-shadow: 0 8px 20px rgba(167, 139, 250, 0.15);
+        }
+
+        .download-icon {
+            font-size: 52px;
+            margin-bottom: 16px;
+        }
+
+        .download-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .download-card p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+        }
+
+        .powerbi-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .prompt-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+    </style>
+
+    <script>
+        // Tab Switching
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.closest('.tab').classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            if (tab === 'auto') {
+                document.getElementById('autoTab').classList.add('active');
+            } else {
+                document.getElementById('promptTab').classList.add('active');
+            }
+        }
+
+        // Mode Selection Function
+        function selectMode(mode) {
+            // Hide mode selection screen
+            document.getElementById('modeSelection').style.display = 'none';
+
+            // Show tab switcher
+            document.getElementById('tabSwitcher').style.display = 'flex';
+
+            if (mode === 'auto') {
+                // Show auto tab content
+                document.getElementById('autoTab').classList.add('active');
+                document.getElementById('autoTabBtn').classList.add('active');
+
+                // Load auto mode analytics
+                loadAutoMode();
+            } else if (mode === 'prompt') {
+                // Show prompt tab content
+                document.getElementById('promptTab').classList.add('active');
+                document.getElementById('promptTabBtn').classList.add('active');
+            }
+        }
+
+        async function loadAutoMode() {
+            try {
+                const response = await fetch("{{ url_for('upload.analyze_auto') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store analytics data globally for saving later
+                    window.dashboardData = {
+                        stats: data.stats,
+                        charts: data.charts,
+                        insights: data.insights
+                    };
+
+                    // Hide loading, show content
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('autoContent').style.display = 'block';
+
+                    // Render Stats
+                    renderStats(data.stats);
+
+                    // Render Insights
+                    renderInsights(data.insights);
+
+                    // Render Charts
+                    renderCharts(data.charts);
+
+                    // Show download section and save section after analytics load
+                    document.getElementById('downloadSection').style.display = 'block';
+                    document.getElementById('saveSection').style.display = 'block';
+                } else {
+                    // Handle API errors
+                    document.getElementById('loadingState').innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="font-size: 64px; margin-bottom: 20px;">😕</div>
+                            <h3 style="color: #dc2626; margin-bottom: 12px;">Analytics Generation Failed</h3>
+                            <p style="color: #6b7280; margin-bottom: 24px;">${data.error || 'Unable to generate analytics'}</p>
+                            <button onclick="loadAutoMode()" style="padding: 12px 24px; background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                                🔄 Retry
+                            </button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+                        <h3 style="color: #dc2626; margin-bottom: 12px;">Connection Error</h3>
+                        <p style="color: #6b7280; margin-bottom: 8px;">Failed to load analytics dashboard</p>
+                        <p style="color: #9ca3af; font-size: 14px; margin-bottom: 24px;">${error.message}</p>
+                        <button onclick="loadAutoMode()" style="padding: 12px 24px; background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            🔄 Try Again
+                        </button>  
+                    </div>
+                `;
+            }
+        }
+
+        function renderStats(stats) {
+            const grid = document.getElementById('statsGrid');
+
+            const formatNumber = (num) => {
+                if (num === null || num === undefined) return '0';
+                return num.toLocaleString('en-US');
+            };
+
+            const formatCurrency = (num) => {
+                if (num === null || num === undefined) return '$0';
+                return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+
+            // Render 10 KPI cards
+            grid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-label">Total Records</div>
+                    <div class="stat-value">${formatNumber(stats.total_records || stats.total_rows)}</div>
+                    <div class="stat-subtitle">Data Points</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-label">Total Columns</div>
+                    <div class="stat-value">${stats.total_columns_count || stats.total_columns}</div>
+                    <div class="stat-subtitle">Fields</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏢</div>
+                    <div class="stat-label">Total Departments</div>
+                    <div class="stat-value">${formatNumber(stats.total_departments || 0)}</div>
+                    <div class="stat-subtitle">Unique Departments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-label">Average Salary</div>
+                    <div class="stat-value">${formatCurrency(stats.average_salary || 0)}</div>
+                    <div class="stat-subtitle">Mean Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-label">Max Salary</div>
+                    <div class="stat-value">${formatCurrency(stats.max_salary || 0)}</div>
+                    <div class="stat-subtitle">Highest Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📉</div>
+                    <div class="stat-label">Min Salary</div>
+                    <div class="stat-value">${formatCurrency(stats.min_salary || 0)}</div>
+                    <div class="stat-subtitle">Lowest Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-label">Median Salary</div>
+                    <div class="stat-value">${formatCurrency(stats.median_salary || 0)}</div>
+                    <div class="stat-subtitle">Middle Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📏</div>
+                    <div class="stat-label">Salary Range</div>
+                    <div class="stat-value">${formatCurrency(stats.salary_range || 0)}</div>
+                    <div class="stat-subtitle">Max - Min</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-label">Data Completeness</div>
+                    <div class="stat-value">${(stats.data_completeness || 100).toFixed(1)}%</div>
+                    <div class="stat-subtitle">Quality Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔢</div>
+                    <div class="stat-label">Unique Values</div>
+                    <div class="stat-value">${formatNumber(stats.total_unique_values || 0)}</div>
+                    <div class="stat-subtitle">Total Unique</div>
+                </div>
+            `;
+        }
+
+        function renderInsights(insights) {
+            const list = document.getElementById('insightsList');
+
+            if (!insights || insights.length === 0) {
+                list.innerHTML = '<li style="color: #9ca3af;">No insights available</li>';
+                return;
+            }
+
+            list.innerHTML = insights.map((insight, index) => `
+                <li style="padding: 16px; background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%); border-radius: 12px; margin-bottom: 12px; border-left: 4px solid #a78bfa; animation: fadeIn 0.5s ease ${index * 0.1}s both;">
+                    ${insight}
+                </li>
+            `).join('');
+        }
+
+        function renderCharts(charts) {
+            const grid = document.getElementById('chartsGrid');
+            grid.innerHTML = '';
+
+            if (!charts || charts.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 40px;">No charts available</p>';
+                return;
+            }
+
+            charts.forEach((chartData, index) => {
+                const container = document.createElement('div');
+                container.className = 'chart-container';
+                container.innerHTML = `
+                    <h3>${chartData.title}</h3>
+                    <canvas id="chart-${index}"></canvas>
+                `;
+                grid.appendChild(container);
+
+                try {
+                    // Merge chart options with any custom options from chartData
+                    const defaultOptions = {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    font: {
+                                        size: 12,
+                                        family: "'Poppins', sans-serif"
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                titleFont: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 13
+                                },
+                                borderColor: '#a78bfa',
+                                borderWidth: 1
+                            }
+                        }
+                    };
+
+                    // Add scales for non-pie/doughnut charts
+                    if (chartData.type !== 'pie' && chartData.type !== 'doughnut' && chartData.type !== 'radar') {
+                        defaultOptions.scales = {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    callback: function (value) {
+                                        // Format large numbers
+                                        if (value >= 1000000) {
+                                            return (value / 1000000).toFixed(1) + 'M';
+                                        }
+                                        if (value >= 1000) {
+                                            return (value / 1000).toFixed(1) + 'k';
+                                        }
+                                        return value;
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        };
+                    }
+
+                    // Handle horizontal bar charts
+                    if (chartData.options && chartData.options.indexAxis === 'y') {
+                        defaultOptions.indexAxis = 'y';
+                        if (defaultOptions.scales) {
+                            defaultOptions.scales.x.beginAtZero = true;
+                            defaultOptions.scales.y.grid = { display: false };
+                        }
+                    }
+
+                    // Merge with custom options from chartData
+                    const finalOptions = { ...defaultOptions, ...(chartData.options || {}) };
+
+                    // Create chart with enhanced options
+                    new Chart(document.getElementById(`chart-${index}`), {
+                        type: chartData.type,
+                        data: chartData.data,
+                        options: finalOptions
+                    });
+                } catch (error) {
+                    console.error(`Error rendering chart ${index}:`, error);
+                    container.innerHTML = `
+                        <h3>${chartData.title}</h3>
+                        <p style="color: #dc2626; text-align: center; padding: 20px;">Chart rendering failed</p>
+                    `;
+                }
+            });
+        }
+
+        // Prompt Mode (Future Feature)
+        async function askQuestion() {
+            const input = document.getElementById('promptInput');
+            const response = document.getElementById('promptResponse');
+            const responseText = document.getElementById('responseText');
+
+            if (!input.value.trim()) {
+                alert('Please enter a question');
+                return;
+            }
+
+            responseText.textContent = 'Processing your question...';
+            response.classList.add('active');
+
+            try {
+                const result = await fetch("{{ url_for('upload.analyze_prompt') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: input.value
+                    })
+                });
+
+                const data = await result.json();
+                responseText.textContent = data.response || 'No response generated';
+            } catch (error) {
+                responseText.textContent = '❌ Feature coming soon! Stay tuned.';
+            }
+        }
+
+        // Save to Database Function
+        async function saveToDatabase() {
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.textContent;
+
+            // Disable button and show loading
+            btn.disabled = true;
+            btn.textContent = '💾 Saving...';
+
+            try {
+                // Prepare dashboard data to send
+                const dashboardPayload = window.dashboardData || {};
+
+                const response = await fetch("{{ url_for('upload.save_to_database') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dashboardPayload)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    btn.textContent = '✅ Saved Successfully!';
+                    btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+                    // Show success message with redirect countdown
+                    const saveStatus = document.getElementById('saveStatus');
+                    saveStatus.style.display = 'block';
+                    saveStatus.innerHTML = `
+                        <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border: 2px solid #10b981; border-radius: 12px; padding: 20px; animation: fadeIn 0.3s ease;">
+                            <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
+                            <h3 style="color: #065f46; font-size: 20px; font-weight: 700; margin-bottom: 8px;">Dataset Saved Successfully!</h3>
+                            <p style="color: #047857; font-size: 15px; margin-bottom: 16px;">
+                                Your dataset has been saved to the database and is now available in Storage.
+                            </p>
+                            <p style="color: #059669; font-size: 14px; font-weight: 600;">
+                                Redirecting to Storage page in <span id="countdown">3</span> seconds...
+                            </p>
+                        </div>
+                    `;
+
+                    // Countdown and redirect
+                    let seconds = 3;
+                    const countdownEl = document.getElementById('countdown');
+                    const countdownInterval = setInterval(() => {
+                        seconds--;
+                        if (countdownEl) countdownEl.textContent = seconds;
+                        if (seconds <= 0) {
+                            clearInterval(countdownInterval);
+                            // Redirect to the saved dashboard if ID is provided
+                            if (data.dashboard_id) {
+                                window.location.href = `/dashboards/${data.dashboard_id}`;
+                            } else {
+                                window.location.href = "{{ url_for('dashboards.dashboard_gallery') }}";
+                            }
+                        }
+                    }, 1000);
+                } else {
+                    btn.textContent = '❌ Failed';
+                    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                    alert('❌ Failed to save: ' + data.error);
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                        btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    }, 3000);
+                }
+            } catch (error) {
+                btn.textContent = '❌ Error';
+                btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                alert('❌ Error: ' + error.message);
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload & Analyze - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .section {
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            position: relative;
+        }
+
+        .progress-step.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .progress-step.completed {
+            color: #10b981;
+        }
+
+        .progress-step.completed::before {
+            content: '✓';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: -10px;
+            color: #10b981;
+            font-size: 1.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            background: #6366f1;
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .column-checkbox {
+            margin: 0.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: #e5e7eb;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: #6366f1;
+            color: white;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">AI Dashboard</a>
+            <ul class="navbar-menu">
+                <li><a href="/" class="navbar-link">Home</a></li>
+                <li><a href="/upload/" class="navbar-link active">Upload Dataset</a></li>
+                <li><a href="/dashboard" class="navbar-link">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-step" id="step1-indicator">1. Upload</div>
+            <div class="progress-step" id="step2-indicator">2. Preview</div>
+            <div class="progress-step" id="step3-indicator">3. Clean</div>
+            <div class="progress-step" id="step4-indicator">4. Select</div>
+            <div class="progress-step" id="step5-indicator">5. Download</div>
+            <div class="progress-step" id="step6-indicator">6. Analyze</div>
+        </div>
+
+        <!-- SECTION 1: Upload -->
+        <div class="section card" id="upload-section">
+            <div class="card-header">
+                <h2 style="margin: 0;">📤 Upload Your Dataset</h2>
+            </div>
+            <div class="card-body">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div style="margin-bottom: 1rem;">
+                        <label for="file" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Choose
+                            File:</label>
+                        <input type="file" id="file" name="file" accept=".csv,.xlsx,.xls" required
+                            style="padding: 0.5rem; border: 2px dashed #6366f1; border-radius: 6px; width: 100%;">
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label for="name" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Dataset
+                            Name:</label>
+                        <input type="text" id="name" name="name" placeholder="e.g. Sales Data 2024"
+                            style="padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem;">
+                        Upload & Preview
+                    </button>
+                </form>
+                <p style="color: var(--text-secondary); margin-top: 1rem; text-align: center;">
+                    Supported formats: CSV, Excel (.xlsx, .xls)
+                </p>
+            </div>
+        </div>
+
+        <!-- SECTION 2: Raw Preview -->
+        <div class="section card hidden" id="preview-section">
+            <div class="card-header">
+                <h2 style="margin: 0;">📋 Raw Data Preview</h2>
+            </div>
+            <div class="card-body">
+                <div id="preview-stats"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="preview-table"></table>
+                </div>
+                <button onclick="cleanData()" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">
+                    🧹 Clean Data
+                </button>
+            </div>
+        </div>
+
+        <!-- SECTION 3: Cleaned Preview -->
+        <div class="section card hidden" id="cleaned-section">
+            <div class="card-header">
+                <h2 style="margin: 0;">✨ Cleaned Data</h2>
+            </div>
+            <div class="card-body">
+                <div id="cleaned-comparison" style="margin-bottom: 1.5rem;"></div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="cleaned-table"></table>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <h3>Select Columns to Keep:</h3>
+                    <div id="column-selection"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; margin: 1rem 0;">
+                    </div>
+                </div>
+                <button onclick="selectColumns()" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    Continue to Download
+                </button>
+            </div>
+        </div>
+
+        <!-- SECTION 4: Download Ready -->
+        <div class="section card hidden" id="download-section">
+            <div class="card-header">
+                <h2 style="margin: 0;">💾 Download Your Dataset</h2>
+            </div>
+            <div class="card-body">
+                <div id="download-info" style="text-align: center; margin-bottom: 1.5rem;"></div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button onclick="downloadCSV()" class="btn btn-primary" style="flex: 1; min-width: 200px;">
+                        📊 Download CSV
+                    </button>
+                    <button onclick="downloadExcel()" class="btn btn-primary"
+                        style="flex: 1; min-width: 200px; background: #10b981;">
+                        📗 Download Excel
+                    </button>
+                </div>
+                <button onclick="showAnalytics()" class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">
+                    📈 Analyze Data
+                </button>
+            </div>
+        </div>
+
+        <!-- SECTION 5: Analytics -->
+        <div class="section card hidden" id="analytics-section">
+            <div class="card-header">
+                <h2 style="margin: 0;">📊 Analytics Dashboard</h2>
+            </div>
+            <div class="card-body">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('auto')">🤖 Auto Mode</button>
+                    <button class="tab" onclick="switchTab('prompt')">💬 Prompt Mode</button>
+                </div>
+
+                <!-- Auto Mode Tab -->
+                <div id="auto-mode-tab">
+                    <div id="auto-stats" style="margin-bottom: 2rem;"></div>
+                    <div id="auto-insights" style="margin-bottom: 2rem;"></div>
+                    <div id="charts-container"></div>
+                </div>
+
+                <!-- Prompt Mode Tab -->
+                <div id="prompt-mode-tab" class="hidden">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Ask a Question:</label>
+                        <textarea id="query-input" rows="3" placeholder="e.g. What is the average salary by department?"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px;"></textarea>
+                    </div>
+                    <button onclick="askQuestion()" class="btn btn-primary" style="width: 100%;">
+                        Ask Question
+                    </button>
+                    <div id="prompt-response" style="margin-top: 1.5rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard_workflow.js') }}"></script>
+</body>
+
+</html>

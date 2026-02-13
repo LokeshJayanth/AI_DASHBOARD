@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raw Preview - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            background: #6366f1;
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">AI Dashboard</a>
+            <ul class="navbar-menu">
+                <li><a href="/" class="navbar-link">Home</a></li>
+                <li><a href="/workflow/" class="navbar-link active">Workflow</a></li>
+                <li><a href="/dashboard" class="navbar-link">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2 style="margin: 0;">📋 Raw Data Preview: {{ dataset_name }}</h2>
+                <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.9rem;">
+                    Step 2 of 6: Review your uploaded data before cleaning
+                </p>
+            </div>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <div class="stat-value">{{ stats.rows }}</div>
+                <div class="stat-label">Total Rows</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
+                <div class="stat-value">{{ stats.columns }}</div>
+                <div class="stat-label">Total Columns</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <div class="stat-value">{{ stats.duplicates }}</div>
+                <div class="stat-label">Duplicate Rows</div>
+            </div>
+        </div>
+
+        {% if stats.duplicates > 0 or stats.null_counts|sum > 0 %}
+        <div class="warning-box">
+            <strong>⚠️ Data Quality Issues Detected:</strong>
+            <ul style="margin: 0.5rem 0 0 1rem;">
+                {% if stats.duplicates > 0 %}
+                <li>{{ stats.duplicates }} duplicate rows will be removed</li>
+                {% endif %}
+                {% for col, null_count in stats.null_counts.items() %}
+                {% if null_count > 0 %}
+                <li>{{ null_count }} NULL values in column "{{ col }}" will be handled</li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+            <p style="margin-top: 0.5rem;"><strong>Don't worry!</strong> Our auto-cleaning will fix these issues.</p>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">Data Preview (First 10 Rows)</div>
+            <div class="card-body" style="overflow-x: auto; padding: 0;">
+                {{ preview|safe }}
+            </div>
+        </div>
+
+        <div class="card" style="text-align: center; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);">
+            <form action="/workflow/clean" method="POST">
+                <h3 style="margin-bottom: 1rem;">Ready to clean your data?</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Our auto-cleaning engine will handle NULLs, duplicates, date formats, and data types
+                </p>
+                <button type="submit" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
+                    Proceed to Auto-Clean →
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

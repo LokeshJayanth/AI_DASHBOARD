@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ dashboard.name }} - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .dashboard-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .dashboard-meta {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(167, 139, 250, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: #1f2937;
+        }
+
+        /* Insights */
+        .insights-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .insights-section h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .insights-list {
+            list-style: none;
+        }
+
+        .insights-list li {
+            padding: 14px 0 14px 30px;
+            position: relative;
+            color: #374151;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .insights-list li:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-container h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h1>📊 {{ dashboard.name }}</h1>
+            <div class="dashboard-meta">
+                <div class="meta-item">
+                    <span>📁 Dataset:</span>
+                    <strong>{{ dashboard.dataset_name }}</strong>
+                </div>
+                {% if dashboard.project_name %}
+                <div class="meta-item">
+                    <span>📂 Project:</span>
+                    <strong>{{ dashboard.project_name }}</strong>
+                </div>
+                {% endif %}
+                <div class="meta-item">
+                    <span>📅 Created:</span>
+                    <strong>{{ dashboard.created_at.strftime('%b %d, %Y') }}</strong>
+                </div>
+                <div class="meta-item">
+                    <span class="badge">🤖 {{ dashboard.mode|upper }} MODE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <!-- Insights -->
+        {% if dashboard.insights_data %}
+        <div class="insights-section">
+            <h2>💡 Key Insights</h2>
+            <ul class="insights-list">
+                {% for insight in dashboard.insights_data %}
+                <li>{{ insight }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Charts -->
+        <div class="charts-grid" id="chartsGrid"></div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <a href="{{ url_for('dashboards.dashboard_gallery') }}" class="btn btn-secondary">
+                ← Back to Gallery
+            </a>
+            <a href="{{ url_for('dashboard.user_dashboard') }}" class="btn btn-primary">
+                Go to Dashboard →
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Render stats from saved data
+        const statsData = {{ dashboard.stats_data| tojson | safe }};
+        const chartsData = {{ dashboard.charts_data| tojson | safe }};
+
+        // Render Stats
+        function renderStats(stats) {
+            const grid = document.getElementById('statsGrid');
+
+            const formatNumber = (num) => {
+                if (num === null || num === undefined) return '0';
+                return num.toLocaleString('en-US');
+            };
+
+            const formatCurrency = (num) => {
+                if (num === null || num === undefined) return '$0';
+                return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+
+            // Render stat cards
+            const statCards = [
+                { icon: '📊', label: 'Total Records', value: formatNumber(stats.total_records || stats.total_rows), subtitle: 'Data Points' },
+                { icon: '📋', label: 'Total Columns', value: stats.total_columns_count || stats.total_columns, subtitle: 'Fields' },
+                { icon: '🏢', label: 'Total Departments', value: stats.total_departments || '-', subtitle: 'Unique Departments' },
+                { icon: '💰', label: 'Average Salary', value: formatCurrency(stats.average_salary), subtitle: 'Mean Value' },
+                { icon: '📊', label: 'Median Salary', value: formatCurrency(stats.median_salary), subtitle: 'Middle Value' },
+                { icon: '💵', label: 'Min Salary', value: formatCurrency(stats.min_salary), subtitle: 'Lowest Value' },
+                { icon: '💸', label: 'Max Salary', value: formatCurrency(stats.max_salary), subtitle: 'Highest Value' },
+                { icon: '📈', label: 'Salary Range', value: formatCurrency(stats.salary_range), subtitle: 'Max - Min' },
+                { icon: '✅', label: 'Data Completeness', value: stats.data_completeness || '100%', subtitle: 'Quality Score' },
+                { icon: '🔢', label: 'Unique Values', value: stats.unique_values || '-', subtitle: 'Total Unique' }
+            ];
+
+            grid.innerHTML = statCards.map(card => `
+                <div class="stat-card">
+                    <div class="stat-icon">${card.icon}</div>
+                    <div class="stat-label">${card.label}</div>
+                    <div class="stat-value">${card.value}</div>
+                    <div class="stat-subtitle" style="font-size: 14px; color: #9ca3af;">${card.subtitle}</div>
+                </div>
+            `).join('');
+        }
+
+        // Render Charts
+        function renderCharts(charts) {
+            const grid = document.getElementById('chartsGrid');
+
+            charts.forEach((chart, index) => {
+                const canvasId = `chart-${index}`;
+                const container = document.createElement('div');
+                container.className = 'chart-container';
+                container.innerHTML = `
+                    <h3>${chart.title || 'Chart'}</h3>
+                    <canvas id="${canvasId}"></canvas>
+                `;
+                grid.appendChild(container);
+
+                // Render chart
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                new Chart(ctx, {
+                    type: chart.type,
+                    data: {
+                        labels: chart.labels,
+                        datasets: [{
+                            label: chart.label || chart.title,
+                            data: chart.data,
+                            backgroundColor: chart.backgroundColor || ['#667eea', '#764ba2', '#f093fb', '#4facfe'],
+                            borderColor: chart.borderColor || '#ffffff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: chart.type !== 'line',
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        // Initialize
+        if (statsData) {
+            renderStats(statsData);
+        }
+        if (chartsData && chartsData.length > 0) {
+            renderCharts(chartsData);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Dataset - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 30px 20px;
+            position: relative;
+        }
+
+
+        /* Main Container */
+        .upload-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12),
+                0 0 0 1px rgba(0, 0, 0, 0.05);
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            animation: slideUpFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUpFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease 0.3s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 15px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .alert.active {
+            display: flex;
+            animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 2px solid #34d399;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 2px solid #f87171;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        /* Form Group */
+        .form-group {
+            margin-bottom: 24px;
+            animation: fadeIn 1s ease 0.4s both;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1),
+                0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Drag & Drop Zone */
+        .drop-zone {
+            border: 3px dashed #cbd5e1;
+            border-radius: 20px;
+            padding: 50px 30px;
+            text-align: center;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+                    transparent,
+                    rgba(102, 126, 234, 0.1),
+                    transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+        }
+
+        .drop-zone:hover::before {
+            left: 100%;
+        }
+
+        .drop-zone:hover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        }
+
+        .drop-zone.dragover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #ddd6fe 0%, #c7d2fe 100%);
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2),
+                0 20px 40px rgba(102, 126, 234, 0.3);
+            animation: borderGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+
+            0%,
+            100% {
+                border-color: #667eea;
+                box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+            }
+
+            50% {
+                border-color: #764ba2;
+                box-shadow: 0 0 0 8px rgba(118, 75, 162, 0.3);
+            }
+        }
+
+        .drop-zone-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .drop-zone-text h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .drop-zone-text p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+
+        .browse-btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            position: relative;
+            z-index: 1;
+        }
+
+        .browse-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .browse-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* File Preview Card */
+        .file-preview {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135d, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #34d399;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2);
+        }
+
+        .file-preview.active {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .file-icon {
+            font-size: 40px;
+            animation: rotateIn 0.5s ease;
+        }
+
+        @keyframes rotateIn {
+            from {
+                opacity: 0;
+                transform: rotate(-180deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: rotate(0);
+            }
+        }
+
+        .file-details h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 4px;
+        }
+
+        .file-details p {
+            font-size: 13px;
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .remove-file {
+            background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+            color: #991b1b;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+        }
+
+        .remove-file:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Progress Container */
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: progressShimmer 2s linear infinite;
+            border-radius: 5px;
+        }
+
+        @keyframes progressShimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #6b7280;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 18px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.3),
+                    transparent);
+            transition: left 0.6s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Info Section */
+        .info-section {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 5px solid #3b82f6;
+            padding: 20px;
+            border-radius: 14px;
+            margin-top: 24px;
+            animation: fadeIn 1s ease 0.6s both;
+        }
+
+        .info-section h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-section li {
+            font-size: 13px;
+            color: #1e3a8a;
+            padding: 6px 0;
+            padding-left: 24px;
+            position: relative;
+            font-weight: 600;
+        }
+
+        .info-section li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 2px solid #e5e7eb;
+            animation: fadeIn 1s ease 0.8s both;
+        }
+
+        .footer p {
+            font-size: 13px;
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        /* Success Checkmark Animation */
+        .success-checkmark {
+            display: none;
+            width: 80px;
+            height: 80px;
+            margin: 20px auto;
+        }
+
+        .success-checkmark.active {
+            display: block;
+            animation: scaleIn 0.5s ease;
+        }
+
+        .checkmark-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke: #34d399;
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark-check {
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            stroke: #34d399;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .upload-container {
+                padding: 30px 25px;
+                border-radius: 24px;
+            }
+
+            .header h1 {
+                font-size: 26px;
+            }
+
+            .drop-zone {
+                padding: 40px 20px;
+            }
+
+            .drop-zone-icon {
+                font-size: 50px;
+            }
+
+            .submit-btn {
+                padding: 16px 24px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="upload-container">
+        <!-- Back Navigation -->
+        <div style="margin-bottom: 20px;">
+            <a href="{{ url_for('dashboard.user_dashboard') }}"
+                style="display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.3s ease;">
+                <span style="font-size: 18px;">←</span> Back to Dashboard
+            </a>
+            {% if project_id %}
+            <div
+                style="margin-top: 12px; padding: 12px 16px; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-left: 4px solid #3b82f6; border-radius: 8px;">
+                <p style="font-size: 13px; color: #1e40af; font-weight: 600; margin: 0;">
+                    📁 Uploading to Project ID: {{ project_id }}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 Upload Your Dataset</h1>
+            <p>Transform raw data into powerful insights</p>
+        </div>
+
+        <!-- Success/Error Alerts -->
+        <div id="alertSuccess" class="alert alert-success"></div>
+        <div id="alertError" class="alert alert-error"></div>
+
+        <!-- Upload Form -->
+        <form id="uploadForm" method="POST" action="{{ url_for('upload.upload_file') }}" enctype="multipart/form-data">
+            <!-- Dataset Name Input -->
+            <div class="form-group">
+                <label class="form-label">📝 Dataset Name</label>
+                <input type="text" name="name" class="form-input" placeholder="e.g., Sales Data Q1 2024" required>
+            </div>
+
+            <!-- File Upload Zone -->
+            <div class="form-group">
+                <label class="form-label">📂 Upload File</label>
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-icon">☁️</div>
+                    <div class="drop-zone-text">
+                        <h3>Drag & Drop your file here</h3>
+                        <p>or</p>
+                        <label class="browse-btn">
+                            Browse Files
+                            <input type="file" name="file" id="fileInput" accept=".csv,.xlsx,.xls,.json" required>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- File Preview Card -->
+                <div class="file-preview" id="filePreview">
+                    <div class="file-info">
+                        <div class="file-icon">📄</div>
+                        <div class="file-details">
+                            <h4 id="fileName">-</h4>
+                            <p id="fileSize">-</p>
+                        </div>
+                    </div>
+                    <button type="button" class="remove-file" onclick="removeFile()">
+                        ✕ Remove
+                    </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Processing...</p>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn" id="submitBtn">
+                ✨ Upload & Analyze
+            </button>
+        </form>
+
+        <!-- Success Checkmark SVG -->
+        <svg class="success-checkmark" id="successCheck" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" stroke-width="2" />
+            <path class="checkmark-check" fill="none" stroke-width="3" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+        </svg>
+
+        <!-- Supported Formats Info -->
+        <div class="info-section">
+            <h4>✅ WE SUPPORT</h4>
+            <ul>
+                <li>CSV, Excel (.xlsx, .xls), JSON files</li>
+                <li>Up to 100MB file size</li>
+                <li>Automatic data cleaning & validation</li>
+                <li>Real-time preview & analytics</li>
+                <li>Power BI ready exports</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Powered by <a href="#">AI Dashboard</a> • Secure & Lightning Fast</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const filePreview = document.getElementById('filePreview');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const submitBtn = document.getElementById('submitBtn');
+        const uploadForm = document.getElementById('uploadForm');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const alertSuccess = document.getElementById('alertSuccess');
+        const alertError = document.getElementById('alertError');
+        const successCheck = document.getElementById('successCheck');
+
+        // Drag & Drop Events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect(files[0]);
+            }
+        });
+
+        // File Input Change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Handle File Selection
+        function handleFileSelect(file) {
+            // Validate file type
+            const validExtensions = ['.csv', '.xlsx', '.xls', '.json'];
+            const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+
+            if (!validExtensions.includes(fileExt)) {
+                showAlert('error', '❌ Invalid file type. Please upload CSV, Excel, or JSON files.');
+                removeFile();
+                return;
+            }
+
+            // Validate file size (100MB)
+            if (file.size > 100 * 1024 * 1024) {
+                showAlert('error', '❌ File size exceeds 100MB limit.');
+                removeFile();
+                return;
+            }
+
+            // Display file info
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            fileName.textContent = file.name;
+            fileSize.textContent = `${sizeMB} MB • ${fileExt.toUpperCase()}`;
+            filePreview.classList.add('active');
+
+            showAlert('success', `✓ ${file.name} selected successfully!`);
+        }
+
+        // Remove File
+        function removeFile() {
+            fileInput.value = '';
+            filePreview.classList.remove('active');
+            hideAlerts();
+        }
+
+        // Show Alert with Animation
+        function showAlert(type, message) {
+            hideAlerts();
+
+            if (type === 'success') {
+                alertSuccess.textContent = message;
+                alertSuccess.classList.add('active');
+
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    alertSuccess.classList.remove('active');
+                }, 3000);
+            } else {
+                alertError.textContent = message;
+                alertError.classList.add('active');
+
+                setTimeout(() => {
+                    alertError.classList.remove('active');
+                }, 4000);
+            }
+        }
+
+        // Hide All Alerts
+        function hideAlerts() {
+            alertSuccess.classList.remove('active');
+            alertError.classList.remove('active');
+        }
+
+        // Form submission - using traditional POST (no AJAX)
+        // The form will submit normally to Flask backend
+    </script>
+</body>
+
+</html>

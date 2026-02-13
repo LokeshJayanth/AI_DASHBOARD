@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Analytics Mode - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .mode-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .mode-card.auto {
+            border-color: #10b981;
+        }
+
+        .mode-card.auto:hover {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        }
+
+        .mode-card.prompt {
+            border-color: #6366f1;
+        }
+
+        .mode-card.prompt:hover {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+        }
+
+        .mode-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .mode-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .mode-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .badge-recommended {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-advanced {
+            background: #6366f1;
+            color: white;
+        }
+
+        .feature-list {
+            text-align: left;
+            margin: 1.5rem 0;
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">AI Dashboard</a>
+            <ul class="navbar-menu">
+                <li><a href="/" class="navbar-link">Home</a></li>
+                <li><a href="/workflow/" class="navbar-link active">Workflow</a></li>
+                <li><a href="/dashboard" class="navbar-link">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card"
+            style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎯 Choose Your Analytics Mode</h1>
+            <p style="font-size: 1.2rem; opacity: 0.95;">
+                Step 6 of 6: How would you like to analyze {{ dataset_name }}?
+            </p>
+        </div>
+
+        <div class="mode-grid">
+            <!-- Auto Mode -->
+            <div class="mode-card auto" onclick="window.location.href='/workflow/auto-mode'">
+                <div class="mode-icon">🤖</div>
+                <div class="mode-title">Auto Mode</div>
+                <div class="mode-badge badge-recommended">RECOMMENDED</div>
+
+                <p style="color: var(--text-secondary); margin: 1rem 0;">
+                    Quick insights without any setup. Perfect for beginners!
+                </p>
+
+                <ul class="feature-list">
+                    <li>Automatic KPI calculations</li>
+                    <li>Pre-built visualizations</li>
+                    <li>Summary statistics</li>
+                    <li>Trend analysis</li>
+                    <li>Distribution charts</li>
+                </ul>
+
+                <a href="/workflow/auto-mode" class="btn btn-primary"
+                    style="width: 100%; margin-top: 1rem; background: #10b981;">
+                    Launch Auto Mode →
+                </a>
+            </div>
+
+            <!-- Prompt Mode -->
+            <div class="mode-card prompt" onclick="window.location.href='/workflow/prompt-mode'">
+                <div class="mode-icon">💬</div>
+                <div class="mode-title">Prompt Mode</div>
+                <div class="mode-badge badge-advanced">ADVANCED</div>
+
+                <p style="color: var(--text-secondary); margin: 1rem 0;">
+                    Ask anything about your data using natural language
+                </p>
+
+                <ul class="feature-list">
+                    <li>Natural language queries</li>
+                    <li>Custom visualizations</li>
+                    <li>AI-powered insights</li>
+                    <li>Complex analysis</li>
+                    <li>Question history</li>
+                </ul>
+
+                <a href="/workflow/prompt-mode" class="btn btn-primary"
+                    style="width: 100%; margin-top: 1rem; background: #6366f1;">
+                    Launch Prompt Mode →
+                </a>
+            </div>
+        </div>
+
+        <div class="card" style="text-align: center; background: #f9fafb;">
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">💡 Not sure which to choose?</h3>
+            <p style="color: var(--text-secondary);">
+                Start with <strong>Auto Mode</strong> to see instant insights, then switch to <strong>Prompt
+                    Mode</strong> for deeper analysis
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

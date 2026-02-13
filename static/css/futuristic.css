@@ -1,0 +1,432 @@
+/* ============================================================================
+   FUTURISTIC UPLOAD WORKFLOW - SHARED DESIGN SYSTEM
+   ============================================================================ */
+
+/* Base Dark Theme */
+:root {
+    /* Dark Backgrounds */
+    --bg-dark: #0a0e27;
+    --bg-darker: #050814;
+    --bg-glass: rgba(255, 255, 255, 0.05);
+
+    /* Gradients per page theme */
+    --gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-orange: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-green: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-blue: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --gradient-pink: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+
+    /* Neon Colors */
+    --neon-purple: #c084fc;
+    --neon-blue: #60a5fa;
+    --neon-green: #34d399;
+    --neon-pink: #f472b6;
+    --neon-orange: #fb923c;
+    --neon-cyan: #22d3ee;
+
+    /* Glass Effect */
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================================
+   ANIMATED BACKGROUNDS
+   ============================================================================ */
+
+.futuristic-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.futuristic-bg::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(138, 43, 226, 0.3), transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(75, 0, 130, 0.2), transparent 50%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Mesh Gradient Background */
+.mesh-gradient {
+    background: linear-gradient(135deg,
+            var(--bg-darker) 0%,
+            #1a1f3a 25%,
+            #2d1b4e 50%,
+            #1a1f3a 75%,
+            var(--bg-darker) 100%);
+    background-size: 400% 400%;
+    animation: meshMove 15s ease infinite;
+}
+
+@keyframes meshMove {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* ============================================================================
+   GLASSMORPHISM CARDS
+   ============================================================================ */
+
+.glass-card {
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.glass-card-purple {
+    border: 1px solid rgba(192, 132, 252, 0.3);
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+}
+
+.glass-card-orange {
+    border: 1px solid rgba(251, 146, 60, 0.3);
+    box-shadow: 0 8px 32px rgba(240, 147, 251, 0.2);
+}
+
+.glass-card-green {
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    box-shadow: 0 8px 32px rgba(79, 172, 254, 0.2);
+}
+
+.glass-card-blue {
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    box-shadow: 0 8px 32px rgba(67, 233, 123, 0.2);
+}
+
+.glass-card-pink {
+    border: 1px solid rgba(244, 114, 182, 0.3);
+    box-shadow: 0 8px 32px rgba(250, 112, 154, 0.2);
+}
+
+/* ============================================================================
+   NEON BUTTONS
+   ============================================================================ */
+
+.neon-btn {
+    position: relative;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.neon-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.neon-btn:hover::before {
+    left: 100%;
+}
+
+.neon-btn-purple {
+    background: var(--gradient-purple);
+    color: white;
+    box-shadow: 0 0 15px rgba(192, 132, 252, 0.4);
+}
+
+.neon-btn-purple:hover {
+    box-shadow: 0 0 25px rgba(192, 132, 252, 0.6);
+    transform: translateY(-2px);
+}
+
+.neon-btn-orange {
+    background: var(--gradient-orange);
+    color: white;
+    box-shadow: 0 0 15px rgba(251, 146, 60, 0.4);
+}
+
+.neon-btn-green {
+    background: var(--gradient-green);
+    color: white;
+    box-shadow: 0 0 15px rgba(52, 211, 153, 0.4);
+}
+
+.neon-btn-blue {
+    background: var(--gradient-blue);
+    color: white;
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+}
+
+.neon-btn-pink {
+    background: var(--gradient-pink);
+    color: white;
+    box-shadow: 0 0 15px rgba(244, 114, 182, 0.4);
+}
+
+/* ============================================================================
+   FLOATING ANIMATION
+   ============================================================================ */
+
+.float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.float-delayed {
+    animation: float 6s ease-in-out 1s infinite;
+}
+
+/* ============================================================================
+   GLOW EFFECTS
+   ============================================================================ */
+
+.glow-purple {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px var(--neon-purple);
+    }
+
+    50% {
+        box-shadow: 0 0 30px var(--neon-purple);
+    }
+}
+
+.glow-orange {
+    animation: glowOrange 2s ease-in-out infinite;
+}
+
+@keyframes glowOrange {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px var(--neon-orange);
+    }
+
+    50% {
+        box-shadow: 0 0 30px var(--neon-orange);
+    }
+}
+
+.glow-green {
+    animation: glowGreen 2s ease-in-out infinite;
+}
+
+@keyframes glowGreen {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px var(--neon-green);
+    }
+
+    50% {
+        box-shadow: 0 0 30px var(--neon-green);
+    }
+}
+
+/* ============================================================================
+   DATA TABLE STYLES
+   ============================================================================ */
+
+.futuristic-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: rgba(10, 14, 39, 0.5);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.futuristic-table thead {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+}
+
+.futuristic-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--neon-purple);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.futuristic-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.futuristic-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.futuristic-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: scale(1.01);
+}
+
+/* ============================================================================
+   STAT CARDS
+   ============================================================================ */
+
+.stat-card-futuristic {
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stat-card-futuristic::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-purple);
+}
+
+.stat-card-futuristic:hover {
+    transform: translateY(-5px) scale(1.02);
+}
+
+.stat-value-futuristic {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: var(--gradient-purple);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0.5rem 0;
+}
+
+.stat-label-futuristic {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ============================================================================
+   PROGRESS BARS
+   ============================================================================ */
+
+.progress-bar-futuristic {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--gradient-purple);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px var(--neon-purple);
+}
+
+/* ============================================================================
+   SHIMMER EFFECT
+   ============================================================================ */
+
+.shimmer {
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    .glass-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .neon-btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .stat-value-futuristic {
+        font-size: 2rem;
+    }
+}

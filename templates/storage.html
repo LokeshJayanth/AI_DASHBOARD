@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.8s ease 0.1s both;
+        }
+
+        .upload-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .upload-area {
+            border: 3px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f1f5f9;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragging {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        .upload-area h3 {
+            font-size: 1.3rem;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-area p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-form {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .form-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-upload {
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-upload:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Datasets Section */
+        .datasets-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .datasets-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .datasets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            animation: fadeIn 0.8s ease 0.2s both;
+        }
+
+        .dataset-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .dataset-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .dataset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .dataset-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1f2937;
+            flex: 1;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.2);
+            filter: brightness(0.8);
+        }
+
+        .dataset-info {
+            margin-bottom: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .info-label {
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-processing {
+            background: #fef3c7;
+            color: #854d0e;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .dataset-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 0.625rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-view {
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        .btn-view:hover {
+            background: #dbeafe;
+        }
+
+        .btn-download {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .btn-download:hover {
+            background: #dcfce7;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Data Preview Table */
+        .preview-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.8s ease 0.2s both;
+        }
+
+        .preview-section h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .preview-table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .preview-table thead {
+            background: #f9fafb;
+        }
+
+        .preview-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .preview-table td {
+            padding: 0.875rem 1rem;
+            color: #6b7280;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .preview-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .preview-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .datasets-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav style="background: rgba(0, 0, 0, 0.3); padding: 1rem 0; margin-bottom: 2rem; backdrop-filter: blur(10px);">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="/" style="color: white; font-size: 1.5rem; font-weight: 700; text-decoration: none;">AI
+                Dashboard</a>
+            <div style="display: flex; gap: 2rem;">
+                <a href="/" style="color: rgba(255,255,255,0.8); text-decoration: none; font-weight: 500;">Home</a>
+                <a href="/upload/"
+                    style="color: rgba(255,255,255,0.8); text-decoration: none; font-weight: 500;">Upload</a>
+                <a href="/storage/"
+                    style="color: white; text-decoration: none; font-weight: 600; border-bottom: 2px solid white;">Storage</a>
+                <a href="/dashboard"
+                    style="color: rgba(255,255,255,0.8); text-decoration: none; font-weight: 500;">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>📦 Storage</h1>
+            <p>Manage all your datasets in one place</p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <h2>📤 Upload New Dataset</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="upload-area" id="uploadArea">
+                    <h3>📁 Drop your file here</h3>
+                    <p>or click to browse (CSV, Excel supported)</p>
+                </div>
+                <input type="file" id="fileInput" name="file" class="file-input" accept=".csv,.xlsx,.xls" required>
+                <div class="upload-form">
+                    <input type="text" id="datasetName" name="name" class="form-input"
+                        placeholder="Dataset name (optional)">
+                    <button type="submit" class="btn-upload" id="uploadBtn">Upload & Save</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Data Preview Section -->
+        <div class="preview-section" id="previewSection" style="display: none;">
+            <h3>📋 Data Preview (First 10 Rows)</h3>
+            <div class="preview-table-container">
+                <table class="preview-table" id="previewTable">
+                    <thead id="previewTableHead">
+                        <!-- Table headers will be inserted here -->
+                    </thead>
+                    <tbody id="previewTableBody">
+                        <!-- Table rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Datasets Section -->
+        <div class="datasets-header">
+            <h2>📊 Your Datasets</h2>
+        </div>
+
+        <div class="datasets-grid" id="datasetsGrid">
+            <!-- Datasets will be loaded here dynamically -->
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script>
+        // Upload functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const datasetsGrid = document.getElementById('datasetsGrid');
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragging');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragging');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragging');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                updateFileInfo(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                updateFileInfo(e.target.files[0]);
+            }
+        });
+
+        function updateFileInfo(file) {
+            const fileSize = (file.size / 1024 / 1024).toFixed(2);
+            uploadArea.innerHTML = `
+                <div style="color: #667eea;">
+                    <h3>✅ ${file.name}</h3>
+                    <p>Size: ${fileSize} MB</p>
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 0.5rem;">Ready to upload</p>
+                </div>
+            `;
+        }
+
+        // Upload form submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(uploadForm);
+            const file = fileInput.files[0];
+
+            // Use filename as default name if not provided
+            if (!formData.get('name')) {
+                formData.set('name', file.name.replace(/\.[^/.]+$/, ''));
+            }
+
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+
+            try {
+                const response = await fetch('/storage/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Dataset uploaded and saved successfully!');
+                    uploadForm.reset();
+                    uploadArea.innerHTML = `
+                        <h3>📁 Drop your file here</h3>
+                        <p>or click to browse (CSV, Excel supported)</p>
+                    `;
+                    loadDatasets();
+                } else {
+                    alert('❌ Upload failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ An error occurred: ' + error.message);
+                console.error('Upload error:', error);
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Upload & Save';
+            }
+        });
+
+        // Load datasets
+        async function loadDatasets() {
+            try {
+                const response = await fetch('/storage/api/list');
+                const data = await response.json();
+
+                if (data.success && data.datasets.length > 0) {
+                    datasetsGrid.innerHTML = data.datasets.map(dataset => {
+                        const statusClass = dataset.status === 'completed' ? 'status-completed' :
+                            dataset.status === 'failed' ? 'status-failed' : 'status-processing';
+
+                        return `
+                            <div class="dataset-card" id="dataset-${dataset.id}">
+                                <div class="dataset-header">
+                                    <div class="dataset-name">${dataset.name}</div>
+                                    <button class="delete-btn" onclick="deleteDataset(${dataset.id})" title="Delete">🗑️</button>
+                                </div>
+                                <div class="dataset-info">
+                                    ${dataset.row_count !== undefined ? `
+                                    <div class="info-row">
+                                        <span class="info-label">Rows:</span>
+                                        <span>${dataset.row_count.toLocaleString()}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Columns:</span>
+                                        <span>${dataset.column_count}</span>
+                                    </div>` : ''}
+                                    <div class="info-row">
+                                        <span class="info-label">Type:</span>
+                                        <span>${dataset.file_type.toUpperCase()}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Size:</span>
+                                        <span>${(dataset.file_size / 1024).toFixed(2)} KB</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Status:</span>
+                                        <span class="status-badge ${statusClass}">${dataset.status}</span>
+                                    </div>
+                                    <div class="info-row" style="margin-top: 0.75rem; color: #9ca3af; font-size: 0.85rem;">
+                                        <span>Uploaded: ${new Date(dataset.created_at).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                <div class="dataset-actions">
+                                    <button class="btn-action btn-view" onclick="viewDataset(${dataset.id})">👁️ View</button>
+                                    <button class="btn-action btn-download" onclick="downloadDataset(${dataset.id})">⬇️ Download</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    datasetsGrid.innerHTML = `
+                        <div class="empty-state">
+                            <h3>📂 No datasets yet</h3>
+                            <p>Upload your first dataset to get started</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                datasetsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>❌ Error loading datasets</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+                console.error('Load error:', error);
+            }
+        }
+
+        // View dataset (reuse from app.js)
+        async function viewDataset(datasetId) {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 2rem;';
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 1rem; max-width: 90vw; max-height: 90vh; overflow: auto; position: relative; padding: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; position: sticky; top: 0; background: white; z-index: 10; padding-bottom: 1rem; border-bottom: 2px solid #667eea;">
+                        <h2 style="color: #667eea; margin: 0;">Dataset Preview</h2>
+                        <button id="closeModalBtn" style="background: none; border: none; color: #1f2937; font-size: 2rem; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
+                    </div>
+                    <div class="spinner-container" style="text-align: center; padding: 3rem;">
+                        <div class="spinner" style="border-color: #e5e7eb; border-top-color: #667eea;"></div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.querySelector('#closeModalBtn').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+
+            try {
+                const response = await fetch(`/dataset/${datasetId}/view`);
+                const data = await response.json();
+
+                if (data.success && data.data && data.data.length > 0) {
+                    const preview = data.data;
+                    const columns = Object.keys(preview[0]);
+
+                    // Add column tags
+                    let columnTagsHTML = '<div style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 1rem; background: #f9fafb; border-radius: 8px;">';
+                    columns.forEach(col => {
+                        columnTagsHTML += `<span style="padding: 0.4rem 0.9rem; background: white; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.85rem; font-weight: 500; color: #374151;">${col}</span>`;
+                    });
+                    columnTagsHTML += '</div>';
+
+                    let tableHTML = columnTagsHTML + '<table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">';
+                    tableHTML += '<thead><tr style="background: #f3f4f6;">';
+                    columns.forEach(col => {
+                        tableHTML += `<th style="padding: 1rem; text-align: left; color: #1f2937; border-bottom: 2px solid #667eea;">${col.toUpperCase()}</th>`;
+                    });
+                    tableHTML += '</tr></thead><tbody>';
+
+                    preview.slice(0, 100).forEach((row, idx) => {
+                        const bgColor = idx % 2 === 0 ? '#f9fafb' : 'white';
+                        tableHTML += `<tr style="background: ${bgColor};">`;
+                        columns.forEach(col => {
+                            const value = row[col] !== null && row[col] !== undefined && row[col] !== '' ? row[col] : '<span style="color: #9ca3af; font-style: italic;">NULL</span>';
+                            tableHTML += `<td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">${value}</td>`;
+                        });
+                        tableHTML += '</tr>';
+                    });
+                    tableHTML += '</tbody></table>';
+
+                    modal.querySelector('.spinner-container').innerHTML = tableHTML;
+                } else {
+                    modal.remove();
+                    alert('No data available');
+                }
+            } catch (error) {
+                modal.remove();
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Delete dataset
+        async function deleteDataset(datasetId) {
+            if (!confirm('Are you sure you want to delete this dataset? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/dataset/${datasetId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const card = document.getElementById(`dataset-${datasetId}`);
+                    if (card) {
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.9)';
+                        card.style.transition = 'all 0.3s ease';
+                        setTimeout(() => {
+                            card.remove();
+                            loadDatasets();
+                        }, 300);
+                    }
+                } else {
+                    alert('Failed to delete: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Download dataset (placeholder)
+        function downloadDataset(datasetId) {
+            alert('Download functionality coming soon! Dataset ID: ' + datasetId);
+        }
+
+        // Load datasets on page load
+        loadDatasets();
+    </script>
+</body>
+
+</html>
