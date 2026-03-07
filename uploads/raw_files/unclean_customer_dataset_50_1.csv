@@ -1,0 +1,51 @@
+Customer_ID,Name,Age,Gender,City,Salary
+101,Anil,,Male,Mumbai,55000
+102,Anil,28.0,Male,Hyderabad,abc
+103,Ravi Kumar,22.0,Male,Chennai,48000
+104,Anil,25.0,,,50000
+105,Sita Devi,200.0,Male,Chennai,45000
+106,Anil,28.0,Male,Mumbai,50000
+107,Sita Devi,25.0,,Mumbai,48000
+108,Meena,-5.0,Male,Delhi,45000
+109,Ravi Kumar,,,Hyderabad,
+110,John,25.0,,Bangalore,
+111,Ravi Kumar,-5.0,Female,Mumbai,abc
+112,Anil,200.0,Male,,55000
+113,Meena,-5.0,Male,,abc
+114,,200.0,,Hyderabad,48000
+115,,200.0,Male,Hyderabad,45000
+116,,-5.0,Male,Bangalore,
+117,Ravi Kumar,30.0,,Chennai,55000
+118,Anil,28.0,Female,Bangalore,50000
+119,John,,Male,Hyderabad,abc
+120,,-5.0,,Delhi,55000
+121,John,200.0,,Hyderabad,55000
+122,Sita Devi,,Female,,55000
+123,Anil,,,Chennai,abc
+124,Meena,28.0,Male,Hyderabad,50000
+125,,28.0,Male,Delhi,50000
+126,Ravi Kumar,30.0,Female,Hyderabad,45000
+127,John,-5.0,Female,Mumbai,55000
+128,John,28.0,,Hyderabad,45000
+129,Anil,28.0,Male,Bangalore,48000
+130,Meena,200.0,Male,Hyderabad,45000
+131,Karthik,-5.0,,Hyderabad,45000
+132,,25.0,Female,Chennai,48000
+133,Sita Devi,,,Mumbai,
+134,Sita Devi,22.0,,Mumbai,abc
+135,Anil,22.0,Female,Hyderabad,48000
+136,Anil,,Female,,45000
+137,Anil,30.0,,Delhi,55000
+138,Anil,200.0,Female,Delhi,abc
+139,John,28.0,Male,Bangalore,50000
+140,Ravi Kumar,30.0,Female,Hyderabad,55000
+141,,22.0,,Bangalore,45000
+142,Karthik,-5.0,Female,Delhi,abc
+143,Ravi Kumar,,Male,,45000
+144,Ravi Kumar,25.0,Male,,55000
+145,Anil,30.0,Male,Chennai,abc
+146,John,28.0,Female,,48000
+147,Karthik,30.0,Female,,
+148,Meena,25.0,,Hyderabad,50000
+149,Sita Devi,,Male,,50000
+150,,-5.0,,Delhi,abc

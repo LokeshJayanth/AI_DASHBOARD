@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Dashboard - Your Complete Data Workflow Solution</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .hero-modern {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero-modern h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .hero-modern p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 3px solid transparent;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+            border-color: #667eea;
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .feature-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .badge-recommended {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-quick {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .badge-pro {
+            background: #6366f1;
+            color: white;
+        }
+
+        .stats-banner {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">
+                <span class="brand-icon">🤖</span>
+                AI Dashboard
+            </a>
+            <ul class="navbar-menu">
+                <li><a href="/" class="navbar-link active">Home</a></li>
+                <li><a href="/upload/" class="navbar-link">Upload Dataset</a></li>
+                <li><a href="/storage/" class="navbar-link">Storage</a></li>
+                <li><a href="/dashboard" class="navbar-link">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero-modern">
+            <h1>🎯 AI-Powered Dataset Analysis</h1>
+            <p>Upload → Clean → Store → Analyze</p>
+            <p style="font-size: 1rem; opacity: 0.85; max-width: 600px; margin: 0 auto 2rem auto;">
+                Upload your datasets for automatic cleaning, intelligent storage in MySQL, and powerful AI-driven
+                analytics
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="/upload/" class="btn btn-primary"
+                    style="font-size: 1.2rem; padding: 1rem 2rem; background: white; color: #667eea;">
+                    📤 Upload Dataset
+                </a>
+                <a href="/storage/" class="btn btn-secondary" style="font-size: 1.2rem; padding: 1rem 2rem;">
+                    📦 View Storage
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Banner -->
+        <div class="stats-banner">
+            <div class="stat-item">
+                <div class="stat-number">Auto</div>
+                <div class="stat-label">Data Cleaning</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">BI-Ready Data</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">MySQL</div>
+                <div class="stat-label">Secure Storage</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">AI</div>
+                <div class="stat-label">Analytics</div>
+            </div>
+        </div>
+
+        <!-- Feature Cards -->
+        <h2 style="text-align: center; margin: 3rem 0 2rem 0; font-size: 2rem;">Get Started</h2>
+
+        <div class="grid grid-2" style="margin-bottom: 3rem;">
+            <!-- Upload Dataset -->
+            <div class="feature-card" onclick="window.location.href='/upload/'">
+                <div class="feature-badge badge-recommended">✨ START HERE</div>
+                <div class="feature-icon">📤</div>
+                <div class="feature-title">Upload Dataset</div>
+                <div class="feature-description">
+                    Upload your CSV, Excel, or JSON files for automatic cleaning and storage.
+                    Your data will be processed, cleaned, and stored in MySQL for analysis.
+                </div>
+                <ul
+                    style="text-align: left; color: var(--text-secondary); font-size: 0.9rem; margin: 0; padding-left: 1.5rem;">
+                    <li>Simple drag & drop interface</li>
+                    <li>Automatic data cleaning</li>
+                    <li>NULL value handling</li>
+                    <li>Duplicate removal</li>
+                    <li>Date formatting (ISO)</li>
+                    <li>Secure MySQL storage</li>
+                    <li>Instant processing</li>
+                </ul>
+                <a href="/upload/" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">
+                    Upload Now →
+                </a>
+            </div>
+
+            <!-- Storage -->
+            <div class="feature-card" onclick="window.location.href='/storage/'">
+                <div class="feature-badge badge-pro">📦 MANAGE</div>
+                <div class="feature-icon">🗂️</div>
+                <div class="feature-title">Storage & Management</div>
+                <div class="feature-description">
+                    View all your uploaded datasets, upload new files, and manage everything
+                    from a centralized storage interface.
+                </div>
+                <ul
+                    style="text-align: left; color: var(--text-secondary); font-size: 0.9rem; margin: 0; padding-left: 1.5rem;">
+                    <li>All datasets in one place</li>
+                    <li>Upload directly from storage</li>
+                    <li>Dataset statistics</li>
+                    <li>Data preview</li>
+                    <li>Delete & manage datasets</li>
+                    <li>Download capabilities</li>
+                    <li>Auto-save to MySQL</li>
+                </ul>
+                <a href="/storage/" class="btn btn-secondary" style="width: 100%; margin-top: 1.5rem;">
+                    View Storage →
+                </a>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="card" style="margin: 3rem 0;">
+            <div class="card-header">
+                <h2 style="margin: 0;">🎓 How It Works</h2>
+            </div>
+            <div class="card-body">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <div
+                        style="padding: 1rem; background: #eff6ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">1️⃣ Upload</div>
+                        <p style="margin: 0; color: var(--text-secondary);">
+                            Drop your CSV, Excel, or JSON file. Add a name and optional description for your dataset.
+                        </p>
+                    </div>
+
+                    <div
+                        style="padding: 1rem; background: #d1fae5; border-radius: 8px; border-left: 4px solid #10b981;">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">2️⃣ Auto-Clean</div>
+                        <p style="margin: 0; color: var(--text-secondary);">
+                            Automatic cleaning: NULLs filled intelligently, duplicates removed, dates formatted to ISO
+                            standard.
+                        </p>
+                    </div>
+
+                    <div
+                        style="padding: 1rem; background: #e0e7ff; border-radius: 8px; border-left: 4px solid #6366f1;">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">3️⃣ Store</div>
+                        <p style="margin: 0; color: var(--text-secondary);">
+                            Cleaned data is securely stored in MySQL with proper data types and indexing.
+                        </p>
+                    </div>
+
+                    <div
+                        style="padding: 1rem; background: #fce7f3; border-radius: 8px; border-left: 4px solid #ec4899;">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">4️⃣ Analyze</div>
+                        <p style="margin: 0; color: var(--text-secondary);">
+                            View your dataset in the dashboard. Run AI-powered queries and get instant insights.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- What You Get -->
+        <div class="card" style="background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);">
+            <div class="card-header">
+                <h2 style="margin: 0;">✨ What Makes This Special</h2>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-2">
+                    <div>
+                        <h3 style="color: #10b981;">🧹 100% BI-Ready Data</h3>
+                        <ul style="color: var(--text-secondary);">
+                            <li>No NULL values (filled intelligently)</li>
+                            <li>No duplicate rows</li>
+                            <li>Dates in ISO format (YYYY-MM-DD)</li>
+                            <li>Correct data types (int/float/text)</li>
+                            <li>Clean column names (snake_case)</li>
+                            <li>Trimmed whitespace</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #6366f1;">📊 Instant Analytics</h3>
+                        <ul style="color: var(--text-secondary);">
+                            <li>Auto-generated KPIs</li>
+                            <li>Interactive Chart.js visualizations</li>
+                            <li>Count by category charts</li>
+                            <li>Trend analysis over time</li>
+                            <li>Distribution histograms</li>
+                            <li>AI-powered natural language queries</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Ready to Analyze Your Data?</h2>
+            <p style="font-size: 1.2rem; opacity: 0.95; margin-bottom: 2rem;">
+                Upload your dataset now and get instant AI-powered insights
+            </p>
+            <a href="/upload/" class="btn btn-primary"
+                style="font-size: 1.3rem; padding: 1rem 3rem; background: white; color: #10b981;">
+                📤 Upload Dataset Now
+            </a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>

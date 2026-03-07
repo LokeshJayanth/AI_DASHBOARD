@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">AI Dashboard</a>
+            <ul class="navbar-menu">
+                <li><a href="/" class="navbar-link">Home</a></li>
+                <li><a href="/upload/" class="navbar-link">Upload</a></li>
+                <li><a href="/storage/" class="navbar-link">Storage</a></li>
+                <li><a href="/dashboard" class="navbar-link active">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section class="hero">
+            <h1 class="hero-title">Dashboard</h1>
+            <p class="hero-subtitle">Manage your datasets and AI queries</p>
+        </section>
+
+        <div class="grid grid-2" style="margin-bottom: 2rem;">
+            <div class="card">
+                <div class="card-header">📊 Your Datasets</div>
+                <div id="datasetsContainer" class="card-body">
+                    <!-- Datasets will be loaded here -->
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">🤖 AI Query</div>
+                <div class="card-body">
+                    <form id="promptForm">
+                        <div class="form-group">
+                            <label class="form-label">Ask a Question</label>
+                            <textarea id="promptInput" class="form-textarea"
+                                placeholder="What insights can you provide about this data?" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Select Dataset (Optional)</label>
+                            <select id="datasetSelect" class="form-select">
+                                <option value="">All datasets</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Query</button>
+                    </form>
+
+                    <div id="promptResponse" style="margin-top: 1.5rem;">
+                        <!-- Response will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="text-align: center;">
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">No datasets yet?</h3>
+            <a href="/upload/" class="btn btn-primary">Upload Your First Dataset</a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>

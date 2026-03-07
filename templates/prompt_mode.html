@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Mode - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .query-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            min-height: 600px;
+        }
+
+        .query-sidebar {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .example-query {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .example-query:hover {
+            border-color: #6366f1;
+            background: #eef2ff;
+        }
+
+        .query-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .query-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .query-input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        .response-area {
+            background: #f9fafb;
+            padding: 2rem;
+            border-radius: 10px;
+            min-height: 300px;
+        }
+
+        .column-tag {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4f46e5;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin: 0.25rem;
+        }
+
+        .dev-banner {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">AI Dashboard</a>
+            <ul class="navbar-menu">
+                <li><a href="/" class="navbar-link">Home</a></li>
+                <li><a href="/workflow/" class="navbar-link">Workflow</a></li>
+                <li><a href="/workflow/prompt-mode" class="navbar-link active">Prompt Mode</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">💬 Prompt Mode: {{ dataset_name }}</h1>
+            <p style="font-size: 1.1rem; opacity: 0.95;">
+                Ask questions about your data in natural language
+            </p>
+        </div>
+
+        <div class="dev-banner">
+            <strong>🚧 Development Notice</strong>
+            <p style="margin: 0.5rem 0 0 0;">
+                Prompt Mode is currently in development. LLM integration will be added soon. For now, you can explore
+                Auto Mode for instant insights!
+            </p>
+        </div>
+
+        <div class="query-container">
+            <!-- Sidebar -->
+            <div class="query-sidebar">
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary);">📚 Your Data</h3>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <strong style="display: block; margin-bottom: 0.5rem;">Available Columns:</strong>
+                    {% for column in columns_info.columns %}
+                    <span class="column-tag">{{ column }}</span>
+                    {% endfor %}
+                </div>
+
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary);">💡 Example Queries</h3>
+
+                <div class="example-query" onclick="fillQuery(this.textContent)">
+                    Show average values by category
+                </div>
+                <div class="example-query" onclick="fillQuery(this.textContent)">
+                    What are the top 10 items?
+                </div>
+                <div class="example-query" onclick="fillQuery(this.textContent)">
+                    Show distribution of values
+                </div>
+                <div class="example-query" onclick="fillQuery(this.textContent)">
+                    Create a trend line over time
+                </div>
+                <div class="example-query" onclick="fillQuery(this.textContent)">
+                    Compare totals by groups
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <a href="/workflow/auto-mode" class="btn btn-secondary" style="width: 100%;">
+                        ← Back to Auto Mode
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Query Area -->
+            <div class="query-input-area">
+                <div class="card">
+                    <div class="card-header">Ask a Question</div>
+                    <div class="card-body">
+                        <form id="queryForm">
+                            <textarea id="queryInput" class="query-input"
+                                placeholder="Example: Show me the average salary by department" required></textarea>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem;">
+                                🔍 Analyze Query
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="responseContainer" class="card" style="display: none;">
+                    <div class="card-header">📊 Response</div>
+                    <div class="card-body">
+                        <div class="response-area" id="responseContent">
+                            <!-- Response will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="text-align: center; background: #f9fafb; margin-top: 2rem;">
+            <h3 style="margin-bottom: 0.5rem;">🚀 Coming Soon</h3>
+            <p style="color: var(--text-secondary);">
+                Advanced LLM integration with Gemini/OpenAI for natural language data queries
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function fillQuery(text) {
+            document.getElementById('queryInput').value = text;
+        }
+
+        document.getElementById('queryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const query = document.getElementById('queryInput').value;
+            const responseContainer = document.getElementById('responseContainer');
+            const responseContent = document.getElementById('responseContent');
+
+            // Show response container
+            responseContainer.style.display = 'block';
+            responseContent.innerHTML = '<p>🔄 Processing your query...</p>';
+
+            try {
+                const response = await fetch('/workflow/api/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    responseContent.innerHTML = `
+                        <div style="background: #d1fae5; padding: 1rem; border-radius: 6px; border-left: 4px solid #10b981;">
+                            <strong>✨ ${data.message}</strong>
+                            <p style="margin: 0.5rem 0 0 0;">Query: "${data.query}"</p>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280;">
+                                We're working on integrating LLM capabilities to answer your questions automatically.
+                                For now, try <a href="/workflow/auto-mode" style="color: #10b981; font-weight: 600;">Auto Mode</a> for instant insights!
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    responseContent.innerHTML = `
+                        <div style="background: #fee2e2; padding: 1rem; border-radius: 6px; border-left: 4px solid #ef4444;">
+                            <strong>❌ Error</strong>
+                            <p style="margin: 0.5rem 0 0 0;">${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                responseContent.innerHTML = `
+                    <div style="background: #fee2e2; padding: 1rem; border-radius: 6px; border-left: 4px solid #ef4444;">
+                        <strong>❌ Error</strong>
+                        <p style="margin: 0.5rem 0 0 0;">Failed to process query: ${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+Roll_No,Student_Name,Marks,Department
+1,Aakash,90,
+2,Arjun,,AI
+3,Arjun,90,Data Science
+4,Sneha,110,ML
+5,Ramesh,,AI
+6,Ramesh,90,AI
+7,,110,Data Science
+8,Divya,abs,Data Science
+9,,90,
+10,Arjun,75,
+11,Divya,,AI
+12,Ramesh,-10,ML
+13,Divya,,
+14,Divya,75,
+15,Aakash,,ML
+16,Ramesh,85,
+17,Ramesh,110,AI
+18,Sneha,90,
+19,Divya,85,
+20,Ramesh,abs,ML
+21,Divya,85,Data Science
+22,Arjun,90,AI
+23,Sneha,abs,Data Science
+24,Ramesh,,ML
+25,Sneha,85,
+26,Sneha,abs,
+27,,-10,ML
+28,Ramesh,85,ML
+29,Ramesh,abs,
+30,Ramesh,75,AI
+31,Ramesh,110,ML
+32,Ramesh,110,Data Science
+33,Ramesh,110,AI
+34,Arjun,abs,
+35,Arjun,75,
+36,Arjun,75,
+37,Arjun,,
+38,Arjun,85,
+39,Ramesh,90,ML
+40,Arjun,85,
+41,Arjun,90,
+42,Arjun,90,ML
+43,Ramesh,85,
+44,,75,Data Science
+45,Ramesh,abs,
+46,Ramesh,90,AI
+47,Aakash,,
+48,Arjun,85,
+49,Sneha,110,ML
+50,Sneha,85,Data Science

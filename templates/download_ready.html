@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Ready - AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .success-banner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .success-banner h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        .download-btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .download-btn.csv {
+            background: #6366f1;
+            color: white;
+        }
+
+        .download-btn.excel {
+            background: #10b981;
+            color: white;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .powerbi-guide {
+            background: #eff6ff;
+            padding: 2rem;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-list li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .step-list li:before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">AI Dashboard</a>
+            <ul class="navbar-menu">
+                <li><a href="/" class="navbar-link">Home</a></li>
+                <li><a href="/workflow/" class="navbar-link active">Workflow</a></li>
+                <li><a href="/dashboard" class="navbar-link">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="success-banner">
+            <h1>🎉 Your Cleaned Dataset is Ready!</h1>
+            <p style="font-size: 1.2rem; opacity: 0.95;">
+                {{ rows }} rows × {{ columns }} columns - 100% BI-Ready
+            </p>
+        </div>
+
+        <div class="grid grid-2">
+            <div class="card">
+                <div class="card-header">💾 Download Your Dataset</div>
+                <div class="card-body">
+                    <p style="margin-bottom: 1.5rem;">Choose your preferred format:</p>
+
+                    <div class="download-buttons" style="flex-direction: column;">
+                        <a href="/workflow/download/csv" class="download-btn csv">
+                            📊 Download as CSV
+                        </a>
+                        <a href="/workflow/download/excel" class="download-btn excel">
+                            📗 Download as Excel
+                        </a>
+                    </div>
+
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1.5rem;">
+                        💡 Both formats are optimized for Power BI, Tableau, and Excel
+                    </p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        📁 Files are also saved in your project's <code>downloads</code> folder
+                    </p>
+                </div>
+            </div>
+
+            <div class="card powerbi-guide">
+                <div class="card-header" style="background: transparent; padding: 0 0 1rem 0; color: #1e40af;">
+                    <h3 style="margin: 0;">📈 Upload to Power BI</h3>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <ul class="step-list">
+                        <li data-step="1">Open <strong>Power BI Desktop</strong></li>
+                        <li data-step="2">Click <strong>Get Data</strong> in the ribbon</li>
+                        <li data-step="3">Select <strong>Text/CSV</strong> or <strong>Excel</strong></li>
+                        <li data-step="4">Browse and select your downloaded file</li>
+                        <li data-step="5">Click <strong>Load</strong> to import the data</li>
+                    </ul>
+
+                    <div style="background: white; padding: 1rem; border-radius: 6px; margin-top: 1rem;">
+                        <strong>✅ Your data is already optimized for:</strong>
+                        <ul style="margin: 0.5rem 0 0 1.5rem; color: var(--text-secondary);">
+                            <li>Proper date formats (YYYY-MM-DD)</li>
+                            <li>Correct numeric types</li>
+                            <li>No NULL values or duplicates</li>
+                            <li>Clean column names</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card"
+            style="text-align: center; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); margin-top: 2rem;">
+            <h3 style="margin-bottom: 1rem;">🚀 What's Next?</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Continue to our analytics dashboard to explore your data with auto-generated insights or custom queries
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="/workflow/mode-selection" class="btn btn-primary" style="font-size: 1.1rem;">
+                    Continue to Analytics →
+                </a>
+                <a href="/workflow/" class="btn btn-secondary" style="font-size: 1.1rem;">
+                    ← Start New Workflow
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

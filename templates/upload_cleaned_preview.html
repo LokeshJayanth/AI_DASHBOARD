@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaned Data Preview - {{ dataset_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Comparison Section */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .comparison-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 2px solid;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .before-card {
+            border-color: #fca5a5;
+            background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+        }
+
+        .before-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.15);
+        }
+
+        .after-card {
+            border-color: #86efac;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+        }
+
+        .after-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.15);
+        }
+
+        .comparison-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .before-card h3 {
+            color: #dc2626;
+        }
+
+        .after-card h3 {
+            color: #16a34a;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .stat-value {
+            font-weight: 700;
+        }
+
+        .before-card .stat-value {
+            color: #dc2626;
+        }
+
+        .after-card .stat-value {
+            color: #16a34a;
+        }
+
+        /* Success Message */
+        .success-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 5px solid #10b981;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease 0.3s both;
+        }
+
+        .success-box p {
+            font-size: 15px;
+            color: #065f46;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* Column Selection Section */
+        .selection-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease 0.4s both;
+        }
+
+        .selection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .selection-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .quick-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover {
+            background: #f9fafb;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        /* Columns Grid */
+        .columns-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .column-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .column-item:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+        .column-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+
+        .column-item label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .column-item input[type="checkbox"]:checked~label {
+            color: #10b981;
+        }
+
+        /* Data Table */
+        .table-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease 0.5s both;
+        }
+
+        .table-section h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 700;
+            color: #1f2937;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #86efac;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 16px;
+            animation: fadeIn 0.8s ease 0.6s both;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            flex: 2;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 26px;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .selection-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .table-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>✨ Data Cleaned Successfully</h1>
+            <p>{{ dataset_name }}</p>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-box">
+            <p>🎉 Your data has been cleaned! Review the improvements below and select the columns you want to keep.</p>
+        </div>
+
+        <!-- Before/After Comparison -->
+        <div class="comparison-grid">
+            <div class="comparison-card before-card">
+                <h3>❌ Before Cleaning</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Rows:</span>
+                    <span class="stat-value">{{ stats.before.rows }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Columns:</span>
+                    <span class="stat-value">{{ stats.before.columns }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">NULL Values:</span>
+                    <span class="stat-value">{{ stats.before.nulls }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Duplicates:</span>
+                    <span class="stat-value">{{ stats.before.duplicates }}</span>
+                </div>
+            </div>
+
+            <div class="comparison-card after-card">
+                <h3>✅ After Cleaning</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Rows:</span>
+                    <span class="stat-value">{{ stats.after.rows }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Columns:</span>
+                    <span class="stat-value">{{ stats.after.columns }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">NULL Values:</span>
+                    <span class="stat-value">{{ stats.after.nulls }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Duplicates:</span>
+                    <span class="stat-value">{{ stats.after.duplicates }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Preview Table -->
+        <div class="table-section">
+            <h2>📋 Cleaned Data Preview (First 10 Rows)</h2>
+            <div class="table-container">
+                {{ preview|safe }}
+            </div>
+        </div>
+
+        <!-- Column Selection -->
+        <form method="POST" action="{{ url_for('upload.select_columns') }}">
+            <div class="selection-section">
+                <div class="selection-header">
+                    <h2>📑 Select Columns to Keep</h2>
+                    <div class="quick-actions">
+                        <button type="button" onclick="selectAll()" class="quick-btn">Select All</button>
+                        <button type="button" onclick="deselectAll()" class="quick-btn">Deselect All</button>
+                    </div>
+                </div>
+
+                <div class="columns-grid">
+                    {% for column in columns %}
+                    <div class="column-item">
+                        <input type="checkbox" name="columns" value="{{ column }}" id="col-{{ loop.index }}" checked>
+                        <label for="col-{{ loop.index }}">{{ column }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actions">
+                <a href="{{ url_for('upload.upload_page') }}" class="btn btn-secondary">
+                    ← Start Over
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    💾 Continue to Download →
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function selectAll() {
+            document.querySelectorAll('input[name="columns"]').forEach(cb => cb.checked = true);
+        }
+
+        function deselectAll() {
+            document.querySelectorAll('input[name="columns"]').forEach(cb => cb.checked = false);
+        }
+    </script>
+</body>
+
+</html>
